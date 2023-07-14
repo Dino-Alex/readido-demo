@@ -1,15 +1,15 @@
-import React, { useEffect,useState  } from 'react';
-import './App.css';
-import contract from './ido';
+import React, { useEffect, useState } from 'react';
 import Web3 from 'web3';
-// import { wallet } from './utils/getWallet';
+import './App.css';
+import useIdoContract from './hooks/ido';
+import contract from './ido';
 import { buyIDO } from './utils/buyIdo';
 
 function App() {
   const [stageInfo, setStageInfo] = useState(null);
   const [slotsPerUser, setSlotsPerUser] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
-
+  const contractAddress = "0x56F803CDe2c37883a5D20aEd7Cb7C8d24F03e295"
   const handleConnectWallet = async () => {
     const connectedAddress = await connectWallet();
     if (connectedAddress) {
@@ -33,24 +33,7 @@ function App() {
       return null;
     }
   };
-
-  async function callSetDevWallet() {
-    try {
-      const devWalletAddress = '0x2F096f22209Eb6d824203686335b3816762C782d'; // Replace with the desired dev wallet address
-  
-      // Call the setDevWallet function on the contract
-      // const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      // const senderAddress = accounts[0];
-      console.log('wallet address', walletAddress);
-      const tx = await contract.methods.setDevWallet(devWalletAddress).send({ from: walletAddress });
-      
-      // Transaction successful
-      console.log('setDevWallet transaction successful:', tx);
-    } catch (error) {
-      // Error occurred
-      console.error('Error calling setDevWallet:', error);
-    }
-  }
+  const { onSetDevWallet } = useIdoContract("0x2F096f22209Eb6d824203686335b3816762C782d", contractAddress)
 
   const handleBuyIDO = async () => {
     if (walletAddress) {
@@ -97,7 +80,7 @@ function App() {
       ) : (
         <button onClick={handleConnectWallet}>Connect Wallet</button>
       )}
-      <button onClick={callSetDevWallet}>Buy</button>
+      <button onClick={onSetDevWallet}>Buy</button>
       <h1>Slots Per User</h1>
       {slotsPerUser && console.log('slots', slotsPerUser)}
       {slotsPerUser ? (<p>{slotsPerUser.toString()}</p>) : (<p>0</p>)}
